@@ -7,10 +7,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import main.entity.Address;
 import main.entity.User;
 import main.service.UserService;
 
@@ -67,6 +70,13 @@ public class HomeController {
 	public String deleteUser(@RequestParam("uid") int uid) {
 		userService.deleteUser(uid);
 		return "redirect:/list";
+	}
+	
+	@GetMapping("/userAddress")
+	public String userAddress(@RequestParam("uid") int uid,Model model) {
+		Address address = userService.getAddress(uid);
+		model.addAttribute("address",address);
+		return "user-address";
 	}
 	
 }

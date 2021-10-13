@@ -15,92 +15,139 @@
 </head>
 <body>
 <header><%@include file="header.jsp" %></header>
- <div class="container">
- <div class="row">
-	 <div class="col-md-3"></div>
-	  <div class="col-md-6">
-	   <h2 class="text-center">User Form</h2>
-	   <div class="panel panel-info">
-	    <div class="panel-heading">
-	     <div class="panel-title">Add User</div>
-	    </div>
-	    <div class="panel-body">
-	     <form:form action="saveUser" cssClass="form-horizontal"
+<div class="container">
+<div class="row border pt-3">
+	<div class="col-md-12">
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="pt-2 text-primary">User registration form</h2>
+				<hr class="bg-warning">
+			</div>
+		</div>
+		<!-- Form to enter user details -->
+		<form:form action="saveUser" cssClass="form-horizontal"
 	      method="post" modelAttribute="user">
-	
 	      <!-- need to associate this data with customer id -->
 	      <form:hidden path="uid" />
-	
-	      <div class="form-group">
-	       <div class="col-md-12">
-	       <label for="firstname" class=" control-label">First Name</label>
-	        <form:input path="firstName" cssClass="form-control" placeholder="First name" />
+	      <div class="row">
+	      	<div class="col-md-6">
+	      		<div class="form-group">
+	      			<label for="firstname" class="control-label">First Name</label>
+	         		<form:input path="firstName" cssClass="form-control" placeholder="First name" />	
+	      		</div>
+	      	</div>
+	      	<div class="col-md-6">
+	      		<div class="form-group">
+					<label for="lastname" class="control-label">Last Name</label>
+	        		<form:input path="lastName" cssClass="form-control" placeholder="Last name" />	      				
+	      		</div>
+	      	</div>
+	      </div>
+	      <div class="row">
+	      	<div class="col-md-6">
+	      		<div class="form-group">
+	      			<label for="email" class="control-label">Email</label>
+	        		<form:input path="email" cssClass="form-control" placeholder="Email"/>		
+	      		</div>
+	      	</div>
+	      	<div class="col-md-6">
+	      		<div class="form-group" id="show_hide_password">
+					<label for="password" class="control-label">Password</label>
+			       	<div class="row no-gutters">
+			       		<div class="col"><form:password path="password" showPassword="true" cssClass="form-control" /></div>
+			       		<div class="col pl-2" style="font-size:1.5em;"><a href="javascript:void(0)"><i class="fa fa-eye-slash"></i></a></div>
+			       	</div>		     				
+	      		</div>
+	      	</div>
+	      </div>
+	      <div class="row">
+	      	<div class="col-md-12">
+		      	<div class="form-group">
+			    	<label for="gender" class="control-label">Gender</label><br>
+			    	<div class="m-3">
+				    	<i>Male</i> <form:radiobutton path="gender" value="M" cssClass="" /> 
+					    <i>Female</i> <form:radiobutton path="gender" value="F" cssClass="" /> 		
+				      	<i>Other</i> <form:radiobutton path="gender" value="O" cssClass="" />
+			    	</div>      	      	
+			  	</div>
+	      	</div>
+	      </div>
+	      <div class="row">
+	       <div class="col-md-6">
+		       <div class="form-group">
+		       	<label for="dob" class="control-label">DOB</label>
+		        <form:input  path="dob" cssClass="form-control" placeholder="dd/MM/yyyy" />
+		       </div>	
+	       </div>
+	        <div class="col-md-6">
+		       <div class="form-group">
+		       	<label for="phoneNumber" class="control-label">Phone Number</label>
+		        <form:input path="phoneNumber" cssClass="form-control" />
+		       </div>	
 	       </div>
 	      </div>
-	      <div class="form-group">
-	       <div class="col-md-12">
-	       <label for="lastname" class="control-label">Last
-	        Name</label>
-	        <form:input path="lastName" cssClass="form-control" placeholder="Last name" />
-	       </div>
+	      <!-- Address field -->
+	      <div class="row">
+	      	<div class="col-12">
+	      		<div class="field_wrapper">
+					<div class="row">
+						<div class="col-md-12 col-sm-12">
+								<fieldset class="border mx-3 px-5">  <legend class="w-auto">Address</legend>
+									    <div class="form-group">
+											<label for="inputAddress1">Address line 1</label>
+											<form:input path="address.inputAddress1" cssClass="form-control" id="inputAddress1" placeholder="1234 Main St" />
+										</div>
+										<div class="form-group">
+											<label for="inputAddress2">Address line 2</label>
+											<form:input path="address.inputAddress2" cssClass="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor" />
+										</div>
+										<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="city">City</label>
+											<form:input path="address.city" cssClass="form-control" id="city" />
+										</div>
+										<div class="form-group col-md-4">
+											<label for="state">State</label>
+											<form:select path="address.state" id="state" cssClass="form-control">
+												<form:option value="other"/>
+												<form:option value="Gujarat" />
+												<form:option value="Maharastra" />
+												<form:option value="Uttar Pradesh" />
+												<form:option value="Madhya Pradesh" />
+											</form:select>
+										</div>
+										<div class="form-group col-md-2">
+											<label for="zip">Zip</label>
+											<form:input path="address.zip" type="text" cssClass="form-control" id="zip" />
+										</div>
+										<div class="form-group">
+											<label for="country">Country</label>
+											<form:input path="address.country" cssClass="form-control" id="country" placeholder="country" />
+										</div>
+							  		</div>
+									<a href="javascript:void(0);" class="btn btn-success add_button float-right" title="Add field"><span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>Add</a>
+								</fieldset>		
+							</div> 
+						</div>	       		        	
+					</div>
+	     		</div>
+	   		</div>     
+	   		<div class="row">
+		       <div class="col-md-6">
+			       	<div class="form-group">
+			       		<!-- Button -->
+					    <div class="text-center">
+					    	<form:button cssClass="btn btn-primary" value="submit">Submit</form:button>
+				    	</div>
+				    </div> 
+		       </div>
 	      </div>
-	
-	      <div class="form-group">
-	       <div class="col-md-12">
-	       	<label for="email" class="control-label">Email</label>
-	        <form:input path="email" cssClass="form-control" placeholder="Email"/>
-	       </div>
-	      </div>
-	      
-	      <div class="form-group">
-	       <div class="col-md-12" id="show_hide_password">
-	       	<label for="password" class="control-label">Password</label>
-	       	<div class="row no-gutters">
-	       		<div class="col"><form:password path="password" showPassword="true" cssClass="form-control" /></div>
-	       		<div class="col pl-2" style="font-size:1.5em;"><a href=""><i class="fa fa-eye-slash"></i></a></div>
-	       	</div>	
-	       </div>
-	      </div>
-	      
-	      <div class="form-group">
-	       <div class="col-md-12">
-	       	<label for="gender" class="control-label">Gender</label><br>
-	        male <form:radiobutton path="gender" value="M" cssClass="form-control" />
-	        female <form:radiobutton path="gender" value="F" cssClass="form-control" />
-	        other <form:radiobutton path="gender" value="O" cssClass="form-control" />
-	       </div>
-	      </div>
-	      
-	      <div class="form-group">
-	       <div class="col-md-12">
-	       	<label for="dob" class="control-label">DOB</label>
-	        <form:input  path="dob" cssClass="form-control" />	
-	       </div>
-	      </div>
-	      
-	      <div class="form-group">
-	       <div class="col-md-12">
-	       <label for="phoneNumber" class="control-label">Phone Number</label>
-	        <form:input path="phoneNumber" cssClass="form-control" />	
-	       </div>
-	      </div>
-	
-	      <div class="form-group">
-	       <!-- Button -->
-	       <div class="col-md-offset-3 col-md-9">
-	        <form:button cssClass="btn btn-primary">Submit</form:button>
-	       </div>
-	      </div>
-	
-	     </form:form>
-	    </div>
-	   </div>
-	  </div>
-	  <div class="col-md-3"></div>
+		</form:form>
 	</div>
- </div>
- 
- 
+</div>	 
+</div>	     
+	
+		      
 <script type="text/javascript"> 
  $(document).ready(function() {
     $("#show_hide_password a").on('click', function(event) {

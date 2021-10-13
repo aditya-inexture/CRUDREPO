@@ -30,6 +30,7 @@
 			       <th>DOB</th>
 			       <th>Gender</th>
 			       <th>Contact</th>
+			       <th>Address</th>
 			       <th>Action</th>    
 		      </tr>
 			</thead>  
@@ -37,15 +38,21 @@
 	      		<!-- loop over and print our customers -->
 	      	<c:forEach var="tempUser" items="${users}">
 	
-	       		<!-- construct an "update" link with customer id -->
+	       		<!-- construct an "update" link with user id -->
 	       		<c:url var="updateLink" value="/updateForm">
 	        		<c:param name="uid" value="${tempUser.uid}" />
 	       		</c:url>
 	
-	       		<!-- construct an "delete" link with customer id -->
+	       		<!-- construct an "delete" link with user id -->
 	       		<c:url var="deleteLink" value="/delete">
 	        		<c:param name="uid" value="${tempUser.uid}" />
 	       		</c:url>
+	       		
+	       		<!-- construct an "delete" link with user id -->
+	       		<c:url var="addressLink" value="/userAddress">
+	        		<c:param name="uid" value="${tempUser.uid}" />
+	       		</c:url>
+	       		
 			<tbody>
 	       		<tr>
 			        <td>${tempUser.firstName}</td>
@@ -54,6 +61,7 @@
 					<td>${tempUser.dob}</td>
 					<td>${tempUser.gender}</td>
 					<td>${tempUser.phoneNumber}</td>
+					<td><a class="btn btn-success" href="${addressLink}" >User address</a></td>
 				
 		        	<td>
 		         	<!-- display the update link --> <a href="${updateLink}">Update</a>
