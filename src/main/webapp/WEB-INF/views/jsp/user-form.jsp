@@ -1,20 +1,32 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
- pageEncoding="UTF-8"%>
+ pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%
+  response.addHeader("Pragma", "no-cache");
+  response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  response.setDateHeader("Expires", 0);
+%>
 <!DOCTYPE html>
 <html>
 <head>
 <title>User Form</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="resources/core/css/bootstrap.min.css">
+<link rel="stylesheet" href="resources/core/css/font-awesome.css">
+<script src="resources/core/js/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
+<script src="resources/core/js/bootstrap.min.js"></script>
+<style type="text/css">
+input:invalid:required {
+	border-color: red;
+}
+</style>
 </head>
 <body>
-<header><%@include file="header.jsp" %></header>
+
+<header>
+<%@include file="header.jsp" %></header>
+<c:if test="${sessionScope.isAdmin }">
 <div class="container">
 <div class="row border pt-3">
 	<div class="col-md-12">
@@ -32,8 +44,8 @@
 	      <div class="row">
 	      	<div class="col-md-6">
 	      		<div class="form-group">
-	      			<label for="firstname" class="control-label">First Name</label>
-	         		<form:input path="firstName" cssClass="form-control" placeholder="First name" />	
+	      			<label for="firstname" class="control-label">First Name <i class="text-danger">*</i></label>
+	         		<form:input path="firstName" cssClass="form-control" placeholder="First name" required="required"/>	
 	      		</div>
 	      	</div>
 	      	<div class="col-md-6">
@@ -46,15 +58,15 @@
 	      <div class="row">
 	      	<div class="col-md-6">
 	      		<div class="form-group">
-	      			<label for="email" class="control-label">Email</label>
-	        		<form:input path="email" cssClass="form-control" placeholder="Email"/>		
+	      			<label for="email" class="control-label">Email <i class="text-danger">*</i></label>
+	        		<form:input path="email" cssClass="form-control" placeholder="Email" required="required"/>		
 	      		</div>
 	      	</div>
 	      	<div class="col-md-6">
 	      		<div class="form-group" id="show_hide_password">
-					<label for="password" class="control-label">Password</label>
+					<label for="password" class="control-label">Password <i class="text-danger">*</i></label>
 			       	<div class="row no-gutters">
-			       		<div class="col"><form:password path="password" showPassword="true" cssClass="form-control" /></div>
+			       		<div class="col"><form:password path="password" showPassword="true" cssClass="form-control" required="required" /></div>
 			       		<div class="col pl-2" style="font-size:1.5em;"><a href="javascript:void(0)"><i class="fa fa-eye-slash"></i></a></div>
 			       	</div>		     				
 	      		</div>
@@ -65,9 +77,9 @@
 		      	<div class="form-group">
 			    	<label for="gender" class="control-label">Gender</label><br>
 			    	<div class="m-3">
-				    	<i>Male</i> <form:radiobutton path="gender" value="M" cssClass="" /> 
-					    <i>Female</i> <form:radiobutton path="gender" value="F" cssClass="" /> 		
-				      	<i>Other</i> <form:radiobutton path="gender" value="O" cssClass="" />
+				    	<i>Male</i> <form:radiobutton path="gender" value="M" /> 
+					    <i>Female</i> <form:radiobutton path="gender" value="F" /> 		
+				      	<i>Other</i> <form:radiobutton path="gender" value="O" checked="checked" />
 			    	</div>      	      	
 			  	</div>
 	      	</div>
@@ -81,8 +93,8 @@
 	       </div>
 	        <div class="col-md-6">
 		       <div class="form-group">
-		       	<label for="phoneNumber" class="control-label">Phone Number</label>
-		        <form:input path="phoneNumber" cssClass="form-control" />
+		       	<label for="phoneNumber" class="control-label">Phone Number <i class="text-danger">*</i></label>
+		        <form:input path="phoneNumber" cssClass="form-control" required="required" />
 		       </div>	
 	       </div>
 	      </div>
@@ -90,25 +102,26 @@
 	      <div class="row">
 	      	<div class="col-12">
 	      		<div class="field_wrapper">
+	      		
 					<div class="row">
 						<div class="col-md-12 col-sm-12">
-								<fieldset class="border mx-3 px-5">  <legend class="w-auto">Address</legend>
+								<fieldset class="border mx-3 px-5">  <legend class="w-auto">Address</legend> 
 									    <div class="form-group">
-											<label for="inputAddress1">Address line 1</label>
-											<form:input path="address.inputAddress1" cssClass="form-control" id="inputAddress1" placeholder="1234 Main St" />
+											<label for="inputAddress1">Address line 1 <i class="text-danger">*</i></label>
+											<form:input path="addresss[0].inputAddress1" required="required" cssClass="form-control" id="inputAddress1" name="address" placeholder="1234 Main St" />
 										</div>
 										<div class="form-group">
 											<label for="inputAddress2">Address line 2</label>
-											<form:input path="address.inputAddress2" cssClass="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor" />
+											<form:input path="addresss[0].inputAddress2" cssClass="form-control" id="inputAddress2" name="address" placeholder="Apartment, studio, or floor" />
 										</div>
 										<div class="form-row">
 										<div class="form-group col-md-6">
-											<label for="city">City</label>
-											<form:input path="address.city" cssClass="form-control" id="city" />
+											<label for="city">City <i class="text-danger">*</i></label>
+											<form:input path="addresss[0].city" required="required" cssClass="form-control" id="city" name="address" />
 										</div>
 										<div class="form-group col-md-4">
-											<label for="state">State</label>
-											<form:select path="address.state" id="state" cssClass="form-control">
+											<label for="state">State <i class="text-danger">*</i></label>
+											<form:select path="addresss[0].state" id="state" name="address" cssClass="form-control" required="required">
 												<form:option value="other"/>
 												<form:option value="Gujarat" />
 												<form:option value="Maharastra" />
@@ -118,17 +131,18 @@
 										</div>
 										<div class="form-group col-md-2">
 											<label for="zip">Zip</label>
-											<form:input path="address.zip" type="text" cssClass="form-control" id="zip" />
+											<form:input path="addresss[0].zip" type="text" cssClass="form-control" id="zip" name="address" />
 										</div>
 										<div class="form-group">
 											<label for="country">Country</label>
-											<form:input path="address.country" cssClass="form-control" id="country" placeholder="country" />
+											<form:input path="addresss[0].country" cssClass="form-control" id="country" name="address" placeholder="country" />
 										</div>
 							  		</div>
 									<a href="javascript:void(0);" class="btn btn-success add_button float-right" title="Add field"><span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>Add</a>
 								</fieldset>		
 							</div> 
-						</div>	       		        	
+						</div>	 
+						   		        	
 					</div>
 	     		</div>
 	   		</div>     
@@ -146,7 +160,7 @@
 	</div>
 </div>	 
 </div>	     
-	
+
 		      
 <script type="text/javascript"> 
  $(document).ready(function() {
@@ -161,9 +175,113 @@
             $('#show_hide_password i').removeClass( "fa-eye-slash" );
             $('#show_hide_password i').addClass( "fa-eye" );
         }
+    });  
+    
+    /* Dynamic address fields insertion */
+    
+    
+    var maxField = 20; //Input fields increment limitation
+    var fieldIncrement = 0;
+    var addButton = $('.add_button'); //Add button selector
+    var wrapper = $('.field_wrapper'); //Input field wrapper
+    	    			
+    var x = 0; //Initial field counter is 0
+    
+
+    //Once add button is clicked
+    $(addButton).click(function(){
+    	
+        //Check maximum number of input fields
+        if(x < maxField){
+        	
+            x++; //Increment field counter
+            
+            addAddressFields(x);
+            
+        }
+        else{
+        	alert("You can only add "+ maxField +" address locations")
+        }
     });
+
+    $(wrapper).on('click', '.add_button_etc', function(e){
+        //Check maximum number of input fields
+        if(x < maxField){ 
+        	
+            x++; //Increment field counter
+            addAddressFields(x);
+            
+        }else{alert("You can only add "+ maxField +" address locations")}
+    });
+    
+    //Once remove_button is clicked
+    $(wrapper).on('click', '.remove_button', function(e){
+        e.preventDefault();
+        	$(this).parent('fieldset').parent('div').fadeTo(800, 0.1, function(){ 
+				$(this).slideUp(5000, function() {}).remove(); //Remove field html.remove();
+		});
+        x--;//Decrement field counter
+    });
+
+    //calling add method which provides form add functionality
+    function addAddressFields(inc){
+    	var fieldHTML = htmlAddressElements(inc);
+    	$(wrapper).append(fieldHTML); //Add field html
+    }
+    
+    //dynamic form input elements
+   function htmlAddressElements(fieldIncrement){
+	   var fieldHTML = '<div class="col-md-12 col-sm-12 float-left bg-light shadow p-3 mb-3 rounded">'
+		    +'<fieldset class="border px-5">  <legend class="w-auto">Address</legend>'
+		    +'<div class="form-group">'
+		    +'<label for="inputAddress1">Address line 1 <i class="text-danger">*</i></label>'
+		    +'<input type="text" name="addresss['+(fieldIncrement)+'].inputAddress1" required="required" class="form-control" placeholder="1234 Main St" />'
+		    +'</div>'
+		    +'<div class="form-group">'
+		    +'<label for="inputAddress2">Address line 2</label>'
+		    +'<input type="text" name="addresss['+(fieldIncrement)+'].inputAddress2" class="form-control" placeholder="Apartment, studio, or floor" />'
+		    +'</div>'
+		    +'<div class="form-row">'
+		    +'<div class="form-group col-md-6">'
+		    +'<label for="city">City <i class="text-danger">*</i></label>'
+		    +'<input type="text" name="addresss['+(fieldIncrement)+'].city" required="required" class="form-control" />'
+		    +'</div>'
+		    +'<div class="form-group col-md-4">'
+		    +'<label for="state">State <i class="text-danger">*</i></label>'
+		    +'<select name="addresss['+(fieldIncrement)+'].state" class="form-control" required="required">'
+		    +'<option value="other">other</option>'
+		    +'<option value="Gujarat">Gujarat</option>'
+		    +'<option value="Maharastra">Maharastra</option>'
+		    +'<option value="Uttar Pradesh">Uttar Pradesh</option>'
+		    +'<option value="Madhya Pradesh">Madhya Pradesh</option>'
+		    +'<select>'
+		    +'</div>'
+		    +'<div class="form-group col-md-2">'
+		    +'<label for="zip">Zip</label>'
+		    +'<input type="text" name="addresss['+(fieldIncrement)+'].zip" class="form-control" />'
+		    +'</div>'
+		    +'<div class="form-group">'
+		    +'<label for="country">Country</label>'
+		    +'<input type="text" name="addresss['+(fieldIncrement)+'].country" class="form-control" placeholder="country" />'
+		    +'</div>'
+		    +'</div>'
+		    +'<a href="javascript:void(0);" class="btn btn-success add_button_etc float-right" title="Add field"><span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>Add</a>'
+		    +'<a href="javascript:void(0);" class="btn btn-danger remove_button" title="Remove field"><span class="glyphicon glyphicon glyphicon-minus" aria-hidden="true"></span>'+'Remove</a>'
+		    +'</fieldset></div>'; //New input field html
+
+		    return fieldHTML;
+   }
+    
 });
 </script>
- 
+
+</c:if>
+<c:if test="${not sessionScope.isAdmin}">
+	<div class="row">
+		<div class="col">
+			<h4 class="text-red text-center">Please login.</h4>
+		</div>
+	</div>
+</c:if>
 </body>
 </html>

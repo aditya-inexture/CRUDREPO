@@ -1,11 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" isELIgnored="false"%>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <title>Insert title here</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-info">
@@ -16,61 +15,56 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
+      <li class="nav-item">
         <a class="nav-link" href='<c:url value="/"/>'> Home <span class="sr-only">(current)</span></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="showForm">Add User</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="list">List Users</a>
-      </li>
+      <c:if test="${sessionScope.isAdmin}">
+	      <li class="nav-item">
+	        <a class="nav-link" href="showForm">Add User</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="list">List Users</a>
+	      </li>
+      </c:if>
+      <c:if test="${sessionScope.isUser}">
+      	<li class="nav-item">
+        	<a class="nav-link" href="listUser">Your profile</a>
+      	</li>
+      </c:if>
 	</ul>
 		<ul class="navbar-nav">
-			<li class="nav-item"><a class="nav-link" href="login">Login</a></li>
+			<li class="nav-item"><a class="nav-link" href="login" id="login-btn">Login</a></li>
+			<li class="nav-item"><a class="nav-link" href="logout" id="logout-btn">Logout</a></li>
 		</ul>
 	</div>
 </nav>
 
+<c:if test="${sessionScope.isAdmin or sessionScope.isUser}">
+	<script type="text/javascript">
+		var login_btn = document.getElementById("login-btn");
+		var logout_btn = document.getElementById("logout-btn");
+		
+		login_btn.style.display = "none";
+		logout_btn.style.display = "block";
+	</script>
+</c:if>
+<c:if test="${not (sessionScope.isAdmin or sessionScope.isUser) }">
+	<script type="text/javascript">
+		var login_btn = document.getElementById("login-btn");
+		var logout_btn = document.getElementById("logout-btn");
+		
+		login_btn.style.display = "block";
+		logout_btn.style.display = "none";
+	</script>
+</c:if>
+
   <!-- JavaScript code -->
          <script>
-  
-            /* Code for changing active 
-            link on clicking */
-            var btns = $(".navbar-nav .nav-item");
-  
-            for (var i = 0; i < btns.length; i++) {
-                btns[i].addEventListener("click",
-                                      function () {
-                    var current = document
-                        .getElementsByClassName("active");
-                    //alert("inside for loop "+current.className);
-  
-                    current[0].className = current[0]
-                        .className.replace(" active", "");
-  
-                    this.className += " active";
-                    //alert("inside for loop "+this.className);
-                });
-            }
-  
-            /* Code for changing active 
-            link on Scrolling */
-            $(window).scroll(function () {
-                var distance = $(window).scrollTop();
-                $('.page-section').each(function (i) {
-  
-                    if ($(this).position().top 
-                        <= distance + 250) {
-                          
-                            $('.navbar-nav a.active')
-                                .removeClass('active');
-  
-                            $('.navbar-nav a').eq(i)
-                                .addClass('active');
-                    }
-                });
-            }).scroll();
+         for (var i = 0; i < document.links.length; i++) {
+        	    if (document.links[i].href == document.URL) {
+        	        document.links[i].className = 'nav-link active';
+        	    }
+        	}
         </script>
  </body>
 </html>

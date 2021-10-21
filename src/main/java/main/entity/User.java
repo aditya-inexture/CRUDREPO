@@ -2,6 +2,7 @@ package main.entity;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -36,22 +37,49 @@ public class User {
 	
 	private char gender;
 	
+	private String type;
+
 	@Column(name = "birthdate")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date dob;
 	
 	private BigInteger phoneNumber;
 	
-	@OneToOne(fetch=FetchType.EAGER,cascade = CascadeType.ALL)
-	@JoinColumn(name = "address_id")
-	private Address address;
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy = "user")
+	private List<Address> addresss;
 	
-	public Address getAddress() {
-		return address;
+	public User() {
 	}
 
-	public void setAddress(Address address) {
-		this.address = address;
+	public User(int uid, String email, String password, String firstName, String lastName, char gender, String type,
+			Date dob, BigInteger phoneNumber, List<Address> addresss) {
+		super();
+		this.uid = uid;
+		this.email = email;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.gender = gender;
+		this.type = type;
+		this.dob = dob;
+		this.phoneNumber = phoneNumber;
+		this.addresss = addresss;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public List<Address> getAddresss() {
+		return addresss;
+	}
+
+	public void setAddresss(List<Address> addresss) {
+		this.addresss = addresss;
 	}
 
 	public int getUid() {
@@ -120,9 +148,9 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User [id=" + uid + ", email=" + email + ", password=" + password + ", firstName=" + firstName
-				+ ", lastName=" + lastName + ", gender=" + gender + ", dob=" + dob + ", phoneNumber=" + phoneNumber
-				+ "]";
+		return "User [uid=" + uid + ", email=" + email + ", password=" + password + ", firstName=" + firstName
+				+ ", lastName=" + lastName + ", gender=" + gender + ", type=" + type + ", dob=" + dob + ", phoneNumber="
+				+ phoneNumber + ", addresss=" + addresss + "]";
 	}
 	
 	

@@ -13,7 +13,7 @@ import main.entity.Address;
 import main.entity.User;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService,UserAddressService,LoginService {
 	
 	@Autowired
 	private UserDAO userDAO;
@@ -44,9 +44,46 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional
-	public Address getAddress(int uid) {
-		
-		return userAddressDAO.getAddress(uid);
+	public List<Address> getAddresss(int uid) {
+		return userAddressDAO.getAddresss(uid);
 	}
+
+	@Transactional
+	public void saveAddress(Address address) {
+		userAddressDAO.saveAddress(address);
+		
+	}
+
+	@Transactional
+	public void deleteAddress(int aid) {
+		userAddressDAO.deleteAddress(aid);
+		
+	}
+
+	@Transactional
+	public String validateUser(String username, String password) throws NullPointerException {
+		User user = getuserByemail(username);
+		if(user != null) {
+			if(user.getEmail().equalsIgnoreCase(username) && user.getPassword().equals(password) && user.getType().equalsIgnoreCase("admin") ) {
+				 return "admin";
+			}
+			else if(user.getEmail().equalsIgnoreCase(username) && user.getPassword().equals(password) && user.getType().equalsIgnoreCase("user") ) {
+				return "normalUser";
+			}
+			else {
+				return "wrongUserOrPassword";
+			}
+		}else {
+			return "notFound";
+		}
+		
+	}
+
+	@Transactional
+	public User getuserByemail(String emails) {
+		User user = userDAO.getuserByemail(emails);
+		return user;
+	}
+
 
 }

@@ -3,6 +3,7 @@ package main.dao;
 import java.util.List;
 
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -12,6 +13,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import main.entity.Address;
 import main.entity.User;
 
 @Repository
@@ -46,6 +48,14 @@ public class UserDAOImpl implements UserDAO {
 		Session session = sessionFactory.getCurrentSession();
 		User user = session.byId(User.class).load(uid);
 		session.delete(user);
+	}
+
+	@SuppressWarnings("unchecked")
+	public User getuserByemail(String email) {
+		Session currentSession = sessionFactory.getCurrentSession();
+		TypedQuery<User> typedQuery = currentSession.createQuery("FROM User U WHERE U.email = :email");
+		User user = typedQuery.setParameter("email", email).getSingleResult();
+		return user;
 	}
 
 }
