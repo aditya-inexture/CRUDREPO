@@ -2,6 +2,11 @@ package main.entity;
 
 public class Login {
 
+	@Override
+	public String toString() {
+		return "Login [username=" + username + ", password=" + password + "]";
+	}
+
 	private String username;
 	
 	private String password;

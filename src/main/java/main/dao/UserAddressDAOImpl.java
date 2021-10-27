@@ -1,5 +1,6 @@
 package main.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -14,36 +15,34 @@ import org.springframework.stereotype.Repository;
 
 import main.entity.Address;
 import main.entity.User;
+import main.generic.GenericDaoImpl;
 import main.service.UserService;
 
 @Repository
-public class UserAddressDAOImpl implements UserAddressDAO {
+public class UserAddressDAOImpl extends GenericDaoImpl<Address> implements UserAddressDAO {
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	@SuppressWarnings("unchecked")
-	public List<Address> getAddresss(int uid) {
+	public ArrayList<Address> getAddresss(int uid) {
 		Session session = sessionFactory.getCurrentSession();
 		CriteriaBuilder cb = session.getCriteriaBuilder();
 		CriteriaQuery<Address> cq = cb.createQuery(Address.class);
 		Root<Address> root = cq.from(Address.class);
 		cq.select(root).where(cb.equal(root.get("user"), uid));
 		Query query = session.createQuery(cq);
-		return query.getResultList();
+		return (ArrayList<Address>) query.getResultList();
 	}
 
-	public void deleteAddress(int aid) {
-		Session session = sessionFactory.getCurrentSession();
-		Address address = session.byId(Address.class).load(aid);
-		address.getUser().getAddresss().remove(address);
-		session.delete(address);		
-	}
-
-	public void saveAddress(Address address) {
-		Session currentSession = sessionFactory.getCurrentSession();
-		currentSession.saveOrUpdate(address);
-	}
-
+	/*
+	 * public void deleteAddress(int aid) { Session session =
+	 * sessionFactory.getCurrentSession(); Address address =
+	 * session.byId(Address.class).load(aid);
+	 * address.getUser().getAddresss().remove(address); session.delete(address); }
+	 * 
+	 * public void saveAddress(Address address) { Session currentSession =
+	 * sessionFactory.getCurrentSession(); currentSession.saveOrUpdate(address); }
+	 */
 
 }

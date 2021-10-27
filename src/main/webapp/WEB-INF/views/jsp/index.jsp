@@ -1,11 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" isELIgnored="false"%>
  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--  <%
+<%
    response.addHeader("Pragma", "no-cache");
   response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   response.setDateHeader("Expires", 0);
-%> --%>
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,12 +19,18 @@
 <body>
 	<header><%@include file="header.jsp" %></header>
 	
-	<div class="container">
+	<div class="container mb-5">
 		<div class="row">
 			<div class="col-md-3"></div>
 			<div class="col-md-6 col-sm-12">
-				<div class="m-5 p-3">
-					<h3 class="text-center mb-4">Welcome <c:if test="${sessionScope.isAdmin}"> <h4 class="text-success">Admin</h4> </c:if> to User Management System</h3>
+				<div class="mt-5 pt-3 text-center">
+					<h2 class="text-center text-primary mb-4">Welcome
+							
+					 <c:if test="${sessionScope.isAdmin}"> 
+					 	<i class="text-warning p-1 m-2">Admin</i>
+					 </c:if> to User Management System</h2>
+					 
+					<input type="hidden" value="${user.uid }">
 				</div>
 			</div>
 			<div class="col-md-3"></div>
@@ -34,7 +40,8 @@
 		</div>
 	</div>
 	
-	<footer></footer>
+	<!-- Footer -->
+	<%@include file="footer.jsp" %>
 	
 </body>
 </html>

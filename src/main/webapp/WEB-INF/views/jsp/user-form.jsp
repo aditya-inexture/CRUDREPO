@@ -16,9 +16,10 @@
 <script src="resources/core/js/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="resources/core/js/bootstrap.min.js"></script>
+<script src="resources/core/js/jquery.validate.min.js"></script>
 <style type="text/css">
-input:invalid:required {
-	border-color: red;
+.invalid{
+	color: red;
 }
 </style>
 </head>
@@ -26,7 +27,7 @@ input:invalid:required {
 
 <header>
 <%@include file="header.jsp" %></header>
-<c:if test="${sessionScope.isAdmin }">
+
 <div class="container">
 <div class="row border pt-3">
 	<div class="col-md-12">
@@ -36,16 +37,18 @@ input:invalid:required {
 				<hr class="bg-warning">
 			</div>
 		</div>
+		
 		<!-- Form to enter user details -->
 		<form:form action="saveUser" cssClass="form-horizontal"
-	      method="post" modelAttribute="user">
-	      <!-- need to associate this data with customer id -->
+	      method="post" modelAttribute="user" enctype="multipart/form-data">
+	      
+	    
 	      <form:hidden path="uid" />
 	      <div class="row">
 	      	<div class="col-md-6">
 	      		<div class="form-group">
 	      			<label for="firstname" class="control-label">First Name <i class="text-danger">*</i></label>
-	         		<form:input path="firstName" cssClass="form-control" placeholder="First name" required="required"/>	
+	         		<form:input path="firstName" cssClass="form-control" placeholder="First name"/>	
 	      		</div>
 	      	</div>
 	      	<div class="col-md-6">
@@ -59,17 +62,25 @@ input:invalid:required {
 	      	<div class="col-md-6">
 	      		<div class="form-group">
 	      			<label for="email" class="control-label">Email <i class="text-danger">*</i></label>
-	        		<form:input path="email" cssClass="form-control" placeholder="Email" required="required"/>		
+	        		<form:input path="email" cssClass="form-control" placeholder="Email"/>		
 	      		</div>
 	      	</div>
 	      	<div class="col-md-6">
 	      		<div class="form-group" id="show_hide_password">
-					<label for="password" class="control-label">Password <i class="text-danger">*</i></label>
+					<label for="password" class="control-label">Password <span class="text-danger">*</span></label>
 			       	<div class="row no-gutters">
-			       		<div class="col"><form:password path="password" showPassword="true" cssClass="form-control" required="required" /></div>
+			       		<div class="col"><form:password path="password" showPassword="true" cssClass="form-control" /></div>
 			       		<div class="col pl-2" style="font-size:1.5em;"><a href="javascript:void(0)"><i class="fa fa-eye-slash"></i></a></div>
 			       	</div>		     				
 	      		</div>
+	      	</div>
+	      </div>
+	      <div class="row">
+	      	<div class="col-md-6 col-sm-12">
+	      		<div class="form-group">
+				    <label for="exampleFormControlFile1">Select profile image</label>
+				    <input type="file" name="commonsMultipartFile" class="form-control-file" id="exampleFormControlFile1">
+				 </div>
 	      	</div>
 	      </div>
 	      <div class="row">
@@ -77,9 +88,9 @@ input:invalid:required {
 		      	<div class="form-group">
 			    	<label for="gender" class="control-label">Gender</label><br>
 			    	<div class="m-3">
-				    	<i>Male</i> <form:radiobutton path="gender" value="M" /> 
-					    <i>Female</i> <form:radiobutton path="gender" value="F" /> 		
-				      	<i>Other</i> <form:radiobutton path="gender" value="O" checked="checked" />
+				    	 <form:radiobutton path="gender" value="M" /> <i>Male</i>
+					     <form:radiobutton path="gender" value="F" /> <i>Female</i>	
+				      	 <form:radiobutton path="gender" value="O" checked="checked" /> <i>Other</i>
 			    	</div>      	      	
 			  	</div>
 	      	</div>
@@ -88,7 +99,7 @@ input:invalid:required {
 	       <div class="col-md-6">
 		       <div class="form-group">
 		       	<label for="dob" class="control-label">DOB</label>
-		        <form:input  path="dob" cssClass="form-control" placeholder="dd/MM/yyyy" />
+		        <form:input type="date"  path="dob" cssClass="form-control" placeholder="yyyy/MM/dd" />
 		       </div>	
 	       </div>
 	        <div class="col-md-6">
@@ -160,7 +171,8 @@ input:invalid:required {
 	</div>
 </div>	 
 </div>	     
-
+<!-- Footer -->
+	<%@include file="footer.jsp" %>
 		      
 <script type="text/javascript"> 
  $(document).ready(function() {
@@ -272,16 +284,60 @@ input:invalid:required {
 		    return fieldHTML;
    }
     
+    
+    
+    
+   
+    
 });
 </script>
 
-</c:if>
-<c:if test="${not sessionScope.isAdmin}">
-	<div class="row">
-		<div class="col">
-			<h4 class="text-red text-center">Please login.</h4>
-		</div>
-	</div>
-</c:if>
+
+
+<script type="text/javascript">
+$("#user").validate({
+	errorClass: "invalid",
+	   rules: {
+	     firstName: {
+	    	 required: true,
+	    	 minlength: 2
+	     },
+	     email: {
+	       required: true,
+	       email: true
+	     },
+	     password: {
+		       required: true,
+		       minlength: 5
+		     },
+		 phoneNumber: {
+			   required: true,
+			   minlength: 10,
+			   maxlength: 10,
+			 },    
+	   },
+	   messages: {
+	     firstName:{
+	    	required: "Please specify your name",
+	    	minlength: jQuery.validator.format("At least {0} characters required!")
+	     }, 
+	     email: {
+	       required: "We need your email address to contact you",
+	       email: "Your email address must be in the format of name@domain.com"
+	     },
+	     password: {
+		       required: "Please enter password",
+		       minlength: jQuery.validator.format("At least {0} characters required!")
+		     },
+		 phoneNumber: {
+			   required: "Please enter your phone number",
+			   minlength: jQuery.validator.format("At least {0} characters required!"),
+			   maxlength: jQuery.validator.format("Please enter valid phone number")
+		},
+	   }
+	 });
+
+</script>
+
 </body>
 </html>

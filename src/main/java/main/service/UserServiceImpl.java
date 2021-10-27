@@ -1,5 +1,6 @@
 package main.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -21,42 +22,42 @@ public class UserServiceImpl implements UserService,UserAddressService,LoginServ
 	@Autowired
 	private UserAddressDAO userAddressDAO;
 
-	@Transactional
+	
 	public List<User> getUsers() {
 		
 		return userDAO.getUsers();
 	}
 
-	@Transactional
+	
 	public void saveUser(User user) {
-		userDAO.saveUser(user);
+		userDAO.create(user);
 	}
 
-	@Transactional
+	
 	public User getUser(int uid) {
 		
-		return userDAO.getUser(uid);
+		return userDAO.find(uid);
 	}
 
-	@Transactional
+	
 	public void deleteUser(int uid) {
-		userDAO.deleteUser(uid);
+		userDAO.delete(uid);
 	}
 
-	@Transactional
-	public List<Address> getAddresss(int uid) {
+	public ArrayList<Address> getAddresss(int uid) {
 		return userAddressDAO.getAddresss(uid);
 	}
 
-	@Transactional
 	public void saveAddress(Address address) {
-		userAddressDAO.saveAddress(address);
+		userAddressDAO.create(address);
 		
 	}
 
 	@Transactional
 	public void deleteAddress(int aid) {
-		userAddressDAO.deleteAddress(aid);
+		Address adr = userAddressDAO.find(aid);
+		adr.getUser().getAddresss().remove(adr);
+		userAddressDAO.delete(aid);
 		
 	}
 
@@ -79,10 +80,15 @@ public class UserServiceImpl implements UserService,UserAddressService,LoginServ
 		
 	}
 
-	@Transactional
+	
 	public User getuserByemail(String emails) {
 		User user = userDAO.getuserByemail(emails);
 		return user;
+	}
+
+
+	public byte[] getUserImage(int uid) {
+		return userDAO.getUserImage(uid);
 	}
 
 

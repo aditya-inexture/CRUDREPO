@@ -1,19 +1,26 @@
 package main.controller;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import main.entity.Address;
 import main.entity.Login;
@@ -27,183 +34,323 @@ public class UserController {
 
 	@Autowired
 	private LoginService loginService;
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private UserAddressService userAddressService;
-	
+
 	private boolean isAdmin = false;
 	private boolean isUser = false;
-	
-	
-	
-	@RequestMapping("/login")
-	public String loginRedirect(Model model) {
+	boolean isInvalid = false;
+
+	@RequestMapping(path = { "/login", "/login/{isInvalid}" })
+	public String loginRedirect(Model model, @PathVariable(name = "isInvalid", required = false) boolean isInvalid) {
 		Login loginCredentials = new Login();
-		model.addAttribute("loginCredentials",loginCredentials);
+
+		model.addAttribute("loginCredentials", loginCredentials);
+		
+		//Check if invalid user (wrong username or password)
+		if(isInvalid == true) {
+			model.addAttribute("invalidLogin","Invalid username or password");
+		}
+		
 		return "login";
 	}
-	
+
 	@RequestMapping(path = "/loginH", method = RequestMethod.POST)
-	public String loginHandler(@ModelAttribute("loginCredentials") Login login, Model model,HttpSession session) {
+	public String loginHandler(@ModelAttribute("loginCredentials") Login login, Model model, HttpSession session) {
+		System.out.println(login);
 		String username = login.getUsername();
 		String password = login.getPassword();
-		
-		String type = loginService.validateUser(username,password);
-		if(type.equalsIgnoreCase("admin")) {
-			isAdmin = true;
-			isUser = false;
-			session.setAttribute("isAdmin", isAdmin);
-			session.setAttribute("isUser", isUser);
-			session.setMaxInactiveInterval(300);
-			
-			return "index";
-		}
-		else if (type.equalsIgnoreCase("normalUser")) {
-			User user = userService.getuserByemail(login.getUsername());
-			int uid = user.getUid();
-			model.addAttribute("user",user);
-			isAdmin = false;
-			isUser = true;
-			session.setAttribute("isUser", isUser);
-			session.setAttribute("isAdmin", isAdmin);
-			session.setAttribute("uid", uid);
 
-			return "index";
+		try {
+			String type = loginService.validateUser(username, password);
+			if (type.equalsIgnoreCase("admin")) {
+				isAdmin = true;
+				isUser = false;
+				session.setAttribute("isAdmin", isAdmin);
+				session.setAttribute("isUser", isUser);
+				session.setMaxInactiveInterval(300);
+
+				return "index";
+			} else if (type.equalsIgnoreCase("normalUser")) {
+				User user = userService.getuserByemail(login.getUsername());
+				int uid = user.getUid();
+				model.addAttribute("user", user);
+				isAdmin = false;
+				isUser = true;
+				session.setAttribute("isUser", isUser);
+				session.setAttribute("isAdmin", isAdmin);
+				session.setAttribute("uid", uid);
+
+				return "index";
+			} else {
+				isInvalid = true;
+				model.addAttribute("isInvalid", isInvalid);
+				return "redirect:/login/{isInvalid}";
+			}
+
+		} catch (Exception e) {
+			isInvalid = true;
+			model.addAttribute("isInvalid", isInvalid);
+			return "redirect:/login/{isInvalid}";
 		}
 
-		return "redirect:/login";
 	}
-	
+
 	@RequestMapping("/logout")
 	public String logoutUser(HttpSession session) {
-		session.removeAttribute("type");
-		session.removeAttribute("user");
-		session.removeAttribute("login");
-		
+		session.removeAttribute("isAdmin");
+		session.removeAttribute("isUser");
+		session.removeAttribute("uid");
+
 		session.invalidate();
 		return "redirect:/login";
 	}
 
-	
-	//For admin to add new user
+	// For admin to add new user
 	@GetMapping("/showForm")
 	public String showFormToAdd(Model model) {
 		User user = new User();
-		model.addAttribute("user",user);
+		model.addAttribute("user", user);
 		return "user-form";
 	}
-	
-	//save user
+
+	// save user
 	@PostMapping("/saveUser")
-	public String saveUser(@ModelAttribute("user") User user) {
-		
-		if(user != null) {
-			for(Address adr : user.getAddresss()) {
-				adr.setUser(user);
+	public String saveUser(@ModelAttribute(name = "user") User user,
+			@RequestParam("commonsMultipartFile") CommonsMultipartFile commonsMultipartFile, HttpSession session,
+			Model model) {
+
+		if (session != null) {
+
+			List<Address> newAdr = new ArrayList<Address>();
+
+			if (user != null) {
+				for (Address adr : user.getAddresss()) {
+					if ((adr.getInputAddress1() == null) && (adr.getCity() == null) && (adr.getState() == null)) {
+						adr.setUser(user);
+						// user.getAddresss().remove(adr);
+					} else {
+						adr.setUser(user);
+						newAdr.add(adr);
+					}
+				}
+
+				user.getAddresss().remove(user.getAddresss());
+				user.setAddresss(newAdr);
+
+				// Convert multipart file to byte array
+				byte[] data = commonsMultipartFile.getBytes();
+				user.setImage(data);
+
+				user.setType("user");
+				userService.saveUser(user);
+				return "redirect:/login";
 			}
-			userService.saveUser(user);
-			return "redirect:/list";	
+			return "redirect:/login";
+		} else {
+			model.addAttribute("e", "Session expired please login again");
+			return "error";
 		}
-		return "redirect:/list";
+
 	}
-	
-	
+
 	// To show all users
 	@GetMapping("/list")
-	public String listUsers(Model model) {
-		List<User> users = userService.getUsers();
-		model.addAttribute("users",users);
-		return "list-users";
-	}
-	
-	 // To show current user
-	  
-		@GetMapping("/listUser")
-		public String listUser(Model model,HttpSession session) {
-			try {
-					int uid = (Integer) session.getAttribute("uid");			
-					
-					User user = userService.getUser(uid);
-					
-					if(user == null) {
-						session.removeAttribute("user");
-						return "redirect:/logout";
-					}
-					
-					model.addAttribute("user", user);
-					return "user-details";
-				}
-			catch(Exception e) {
-				model.addAttribute("user",session.getAttribute("user"));
-				return "error";
-			}
+	public String listUsers(Model model, HttpSession session) {
+		if (session != null) {
+			List<User> users = userService.getUsers();
+			model.addAttribute("users", users);
+			return "list-users";
+		} else {
+			model.addAttribute("errorMessage", "Session expired please login again");
+			return "error";
 		}
-		
-		@RequestMapping("/userDetails")
-		public String userDetails(@RequestParam("uid") int uid, Model model) {
-			User user = userService.getUser(uid);
-			if(user != null) {
+	}
+
+	// To show current user
+
+	@GetMapping("/listUser")
+	public String listUser(Model model, HttpSession session) {
+		if (session != null) {
+			try {
+				int uid = (Integer) session.getAttribute("uid");
+
+				User user = userService.getUser(uid);
+
+				if (user == null) {
+					session.removeAttribute("user");
+					return "redirect:/logout";
+				}
+
+				// encode byte to UTF-8
+				if (user.getImage() != null) {
+					byte[] encodeBase64 = Base64.getEncoder().encode(user.getImage());
+					String base64Encoded = new String(encodeBase64, "UTF-8");
+					// Add encoded image into model attribute, to display in user-details page
+					model.addAttribute("userImage", base64Encoded);
+				}
+
 				model.addAttribute("user", user);
 				return "user-details";
+			} catch (Exception e) {
+				// model.addAttribute("user",session.getAttribute("user"));
+				System.out.println(e);
+				return "error";
 			}
-			if(isAdmin) {
+		} else {
+			model.addAttribute("errorMessage", "Session expired please login again");
+			return "error";
+		}
+
+	}
+
+	@RequestMapping("/userDetails")
+	public String userDetails(@RequestParam("uid") int uid, Model model, HttpSession session) throws IOException {
+		if (session != null) {
+			User user = userService.getUser(uid);
+			if (user != null) {
+				if (user.getImage() != null) {
+					byte[] encodeBase64 = Base64.getEncoder().encode(user.getImage());
+					String base64Encoded = new String(encodeBase64, "UTF-8");
+					// Add encoded image into model attribute, to display in user-details page
+					model.addAttribute("userImage", base64Encoded);
+				}
+				model.addAttribute("user", user);
+				// return "user-details";
+				return "user-details";
+			}
+			if (isAdmin) {
 				model.addAttribute("userNotFound", "userNotFound");
 				return "redirect:/list";
 			}
 			return "error";
+		} else {
+			model.addAttribute("errorMessage", "Session expired please login again");
+			return "error";
 		}
-		
-		
-		
-		@RequestMapping("/updateUser")
-		public String updateUser(@ModelAttribute("user") User user,Model model,HttpSession session) {
-			System.out.println("Before saving user " + user);
-			System.out.println("Before saving user " + user.getAddresss());
-			
-			if(user != null) {
-				if(user.getAddresss() != null) {
-					for(Address adr : user.getAddresss()) {
-						adr.setUser(user);
-						//adr.setAid(aid);
-						userAddressService.saveAddress(adr);
-						System.out.println("This address saved " + adr.getAid());
+
+	}
+
+	@RequestMapping("/updateUser")
+	public String updateUser(@ModelAttribute("user") User user, Model model,
+			@RequestParam("commonsMultipartFile") CommonsMultipartFile commonsMultipartFile, HttpSession session) {
+		if (session != null) {
+			if (user != null) {
+				if (user.getAddresss() != null) {
+					for (Address adr : user.getAddresss()) {
+
+						if (adr == null && (adr.getInputAddress1() == null) && (adr.getCity() == null)
+								&& (adr.getState() == null)) {
+							user.getAddresss().remove(adr);
+							continue;
+						}
+
+						if (adr != null && (adr.getInputAddress1() != null) && (adr.getCity() != null)
+								&& (adr.getState() != null)) {
+							adr.setUser(user);
+							// adr.setAid(aid);
+							userAddressService.saveAddress(adr);
+						}
+
 					}
 				}
+
+				if (commonsMultipartFile.getSize() != 0) {
+					System.out.println("inside if part of multipart");
+					// Convert multipart file to byte array
+					byte[] data = commonsMultipartFile.getBytes();
+					user.setImage(data);
+				} else {
+
+					user.setImage(userService.getUserImage(user.getUid()));
+				}
+
 				user.setType("user");
 				userService.saveUser(user);
-				String msg="User updates successfully";
-				model.addAttribute("msg",msg);
+				String msg = "User updates successfully";
+				model.addAttribute("msg", msg);
 
 			}
 			Object findIfAdmin = session.getAttribute("isAdmin").toString();
-			System.out.println("Object finfifString wala  " + findIfAdmin);
-			if(findIfAdmin.equals("true")) {return "redirect:/list";}
-			else {
+
+			if (findIfAdmin.equals("true")) {
+				return "redirect:/list";
+			} else {
 				return "redirect:/listUser";
 			}
+		} else {
+			model.addAttribute("errorMessage", "Session expired please login again");
+			return "error";
 		}
-		
-		//Address of user
-		@GetMapping("/userAddress")
-		public String userAddress(@RequestParam("uid") int uid,Model model) {
+
+	}
+
+	// Address of user non ajax
+	@GetMapping("/userAddress")
+	public String userAddress(@RequestParam("uid") int uid, Model model, HttpSession session) {
+		if (session != null) {
 			List<Address> addresss = userAddressService.getAddresss(uid);
-			model.addAttribute("addresss",addresss);
+			model.addAttribute("addresss", addresss);
 			return "user-address";
+		} else {
+			model.addAttribute("errorMessage", "Session expired please login again");
+			return "error";
 		}
-		
-		//Delete current address
-		@RequestMapping("/deleteAddress")
-		public String deleteUserAddress(@RequestParam("aid") int aid,HttpSession session) {
+	}
+
+	// for ajax call
+	@GetMapping("/getUserAddress/{uid}")
+	public @ResponseBody ArrayList<Address> getUserAddress(@PathVariable int uid, HttpSession session) {
+		System.out.println("before getting address : " + uid);
+		ArrayList<Address> addresss = userAddressService.getAddresss(uid);
+		// model.addAttribute("addresss",addresss);
+		// System.out.println(addresss);
+		return addresss;
+	}
+
+	// Delete current address
+	@RequestMapping(path = "/deleteAddress")
+	public String deleteUserAddress(@RequestParam("aid") int aid, HttpSession session, Model model) {
+		if (session != null) {
 			userAddressService.deleteAddress(aid);
-			//return "redirect:/list";
+			// return "redirect:/list";
 			Object findIfAdmin = session.getAttribute("isAdmin").toString();
-			System.out.println("Object finfifString wala  " + findIfAdmin);
-			if(findIfAdmin.equals("true")) {return "redirect:/list";}
+			if (findIfAdmin.equals("true")) {
+				return "redirect:/list";
+			}
 			return "redirect:/listUser";
+		} else {
+			model.addAttribute("errorMessage", "Session expired please login again");
+			return "error";
 		}
-		
-		
+	}
+
+	@RequestMapping(path = "/updateAddress")
+	public @ResponseBody String updateAddress(@ModelAttribute("ao") Address ao) {
+		System.out.println("Inside ajax update method " + ao);
+		userAddressService.saveAddress(ao);
+		return "user Updated Successfully";
+	}
+
+	@GetMapping("/deleteUser/{uid}")
+	public @ResponseBody String deleteUser(@PathVariable int uid, Model model, HttpSession session) {
+		if (session != null) {
+			try {
+				userService.deleteUser(uid);
+				return "user deleted";
+			} catch (Exception e) {
+				return "error while deleting user";
+			}
+
+		} else {
+			model.addAttribute("errorMessage", "Session expired please login again");
+			return "error";
+		}
+
+	}
+
 }

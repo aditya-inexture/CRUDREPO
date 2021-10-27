@@ -12,11 +12,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
@@ -40,7 +45,7 @@ public class User {
 	private String type;
 
 	@Column(name = "birthdate")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date dob;
 	
 	private BigInteger phoneNumber;
@@ -48,11 +53,17 @@ public class User {
 	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy = "user")
 	private List<Address> addresss;
 	
+	@Transient
+	private CommonsMultipartFile commonsMultipartFile;
+	
+	@Lob
+	private byte[] image;
+	
 	public User() {
 	}
 
 	public User(int uid, String email, String password, String firstName, String lastName, char gender, String type,
-			Date dob, BigInteger phoneNumber, List<Address> addresss) {
+			Date dob, BigInteger phoneNumber, List<Address> addresss, byte[] image) {
 		super();
 		this.uid = uid;
 		this.email = email;
@@ -64,6 +75,23 @@ public class User {
 		this.dob = dob;
 		this.phoneNumber = phoneNumber;
 		this.addresss = addresss;
+		this.image = image;
+	}
+
+	public CommonsMultipartFile getCommonsMultipartFile() {
+		return commonsMultipartFile;
+	}
+
+	public void setCommonsMultipartFile(CommonsMultipartFile commonsMultipartFile) {
+		this.commonsMultipartFile = commonsMultipartFile;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 
 	public String getType() {
@@ -74,10 +102,12 @@ public class User {
 		this.type = type;
 	}
 	
+	@JsonIgnore
 	public List<Address> getAddresss() {
 		return addresss;
 	}
 
+	@JsonIgnore
 	public void setAddresss(List<Address> addresss) {
 		this.addresss = addresss;
 	}
@@ -150,7 +180,7 @@ public class User {
 	public String toString() {
 		return "User [uid=" + uid + ", email=" + email + ", password=" + password + ", firstName=" + firstName
 				+ ", lastName=" + lastName + ", gender=" + gender + ", type=" + type + ", dob=" + dob + ", phoneNumber="
-				+ phoneNumber + ", addresss=" + addresss + "]";
+				+ phoneNumber + "]";
 	}
 	
 	

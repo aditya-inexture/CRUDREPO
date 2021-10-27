@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "USER_ADDRESS")
@@ -36,10 +38,12 @@ public class Address {
 	@JoinColumn(name = "user_id",updatable = false)
 	private User user;
 
+	@JsonIgnore
 	public User getUser() {
 		return user;
 	}
 
+	@JsonIgnore
 	public void setUser(User user) {
 		this.user = user;
 	}
@@ -101,6 +105,22 @@ public class Address {
 		return "Address [aid=" + aid + ", inputAddress1=" + inputAddress1 + ", inputAddress2=" + inputAddress2
 				+ ", city=" + city + ", state=" + state + ", zip=" + zip + ", country=" + country + ", user=" + user
 				+ "]";
+	}
+
+	public Address() {
+	}
+
+	public Address(int aid, String inputAddress1, String inputAddress2, String city, String state, String zip,
+			String country, User user) {
+		super();
+		this.aid = aid;
+		this.inputAddress1 = inputAddress1;
+		this.inputAddress2 = inputAddress2;
+		this.city = city;
+		this.state = state;
+		this.zip = zip;
+		this.country = country;
+		this.user = user;
 	}
 
 	public void setCountry(String country) {

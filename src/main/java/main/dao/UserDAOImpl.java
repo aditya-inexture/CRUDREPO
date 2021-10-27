@@ -15,9 +15,10 @@ import org.springframework.stereotype.Repository;
 
 import main.entity.Address;
 import main.entity.User;
+import main.generic.GenericDaoImpl;
 
 @Repository
-public class UserDAOImpl implements UserDAO {
+public class UserDAOImpl extends GenericDaoImpl<User> implements UserDAO {
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -33,29 +34,33 @@ public class UserDAOImpl implements UserDAO {
 		return query.getResultList();
 	}
 
-	public void saveUser(User user) {
-		Session currentSession = sessionFactory.getCurrentSession();
-		currentSession.saveOrUpdate(user);
-	}
-
-	public User getUser(int uid) {
-		Session currentSession = sessionFactory.getCurrentSession();
-		User user = currentSession.get(User.class, uid);
-		return user;
-	}
-
-	public void deleteUser(int uid) {
-		Session session = sessionFactory.getCurrentSession();
-		User user = session.byId(User.class).load(uid);
-		session.delete(user);
-	}
-
+	/*
+	 * public void saveUser(User user) { Session currentSession =
+	 * sessionFactory.getCurrentSession(); currentSession.saveOrUpdate(user); }
+	 * 
+	 * public User getUser(int uid) { Session currentSession =
+	 * sessionFactory.getCurrentSession(); User user =
+	 * currentSession.get(User.class, uid); return user; }
+	 * 
+	 * public void deleteUser(int uid) { Session session =
+	 * sessionFactory.getCurrentSession(); User user =
+	 * session.byId(User.class).load(uid); session.delete(user); }
+	 */
 	@SuppressWarnings("unchecked")
 	public User getuserByemail(String email) {
 		Session currentSession = sessionFactory.getCurrentSession();
 		TypedQuery<User> typedQuery = currentSession.createQuery("FROM User U WHERE U.email = :email");
 		User user = typedQuery.setParameter("email", email).getSingleResult();
 		return user;
+	}
+
+	public byte[] getUserImage(int uid) {
+		Session currentSession = sessionFactory.getCurrentSession();
+		@SuppressWarnings("unchecked")
+		TypedQuery<User> typedQuery = currentSession.createQuery("FROM User U WHERE U.uid = :uid");
+		User user = typedQuery.setParameter("uid", uid).getSingleResult();
+		byte[] image = user.getImage();
+		return image;
 	}
 
 }

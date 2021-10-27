@@ -20,9 +20,6 @@
       </li>
       <c:if test="${sessionScope.isAdmin}">
 	      <li class="nav-item">
-	        <a class="nav-link" href="showForm">Add User</a>
-	      </li>
-	      <li class="nav-item">
 	        <a class="nav-link" href="list">List Users</a>
 	      </li>
       </c:if>
@@ -31,6 +28,11 @@
         	<a class="nav-link" href="listUser">Your profile</a>
       	</li>
       </c:if>
+      <c:if test="${(not sessionScope.isUser) and (not sessionScope.isAdmin)}">
+      <li class="nav-item">
+	        <a class="nav-link" href="showForm">Register</a>
+	  </li>
+	  </c:if>
 	</ul>
 		<ul class="navbar-nav">
 			<li class="nav-item"><a class="nav-link" href="login" id="login-btn">Login</a></li>

@@ -2,6 +2,11 @@
     pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%
+  response.addHeader("Pragma", "no-cache");
+  response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  response.setDateHeader("Expires", 0);
+%> 
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,7 +32,7 @@
 							<th>State</th>
 							<th>Zip</th>
 							<th>Country</th>
-							<th>Action</th>
+							<!-- <th>Action</th> -->
 						</tr>
 					</thead>
 					<tbody>
@@ -55,10 +60,10 @@
 								<td>${addresss.state}</td>
 								<td>${addresss.zip}</td>
 								<td>${addresss.country}</td>
-								<td>
+								<%-- <td>
 									<a href="${updateLink }">Update</a>
 									 | <a href="${deleteLink }">Delete</a>
-								</td>
+								</td> --%>
 							</tr>
 						</c:forEach>
 						</c:if>
@@ -68,5 +73,7 @@
 			</div>
 		</div>		
 	</div>
+	<!-- Footer -->
+	<%@include file="footer.jsp" %>
 </body>
 </html>
