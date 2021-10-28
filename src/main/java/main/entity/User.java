@@ -50,7 +50,7 @@ public class User {
 	
 	private BigInteger phoneNumber;
 	
-	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy = "user")
+	@OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL,mappedBy = "user",orphanRemoval = true)
 	private List<Address> addresss;
 	
 	@Transient

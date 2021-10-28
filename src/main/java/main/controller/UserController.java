@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -44,6 +45,42 @@ public class UserController {
 	private boolean isAdmin = false;
 	private boolean isUser = false;
 	boolean isInvalid = false;
+	
+	
+	@RequestMapping(path = {"/forgotPassword","/forgotPassword/{passwordError}"})
+	public String forgotPassword(@PathVariable(required = false) String passwordError,Model model) {
+		model.addAttribute("passwordError", passwordError);
+		return "forgot-password";
+	}
+	
+	//change user password if email is valid (if user exists in the system).
+	@RequestMapping(path = "/forgotPasswordHandler")
+	public String forgotPasswordHandler(Model model,@RequestParam("email") String email,@RequestParam("newPassword") String newPassword,@RequestParam("confirmNewPassword") String confirmNewPassword) {
+	try {
+		
+		User user = userService.getuserByemail(email);
+		if(user.getEmail().equalsIgnoreCase(email)) {
+			
+			if(newPassword.equals(confirmNewPassword)) {
+				user.setPassword(newPassword);
+				userService.saveUser(user);
+				return "redirect:/login";
+			}else {
+				model.addAttribute("passwordError", "password must match");
+				return "redirect:/forgotPassword/{passwordError}";
+			}		
+			
+		}else {
+			model.addAttribute("passwordError", "email does not exist, please enter registered email id");
+			return "redirect:/forgotPassword/{passwordError}";
+		}
+		
+	}catch(Exception e) {
+			model.addAttribute("passwordError", "email does not exist, please enter registered email id");
+			return "redirect:/forgotPassword/{passwordError}";
+	}
+		
+	}
 
 	@RequestMapping(path = { "/login", "/login/{isInvalid}" })
 	public String loginRedirect(Model model, @PathVariable(name = "isInvalid", required = false) boolean isInvalid) {
@@ -240,22 +277,66 @@ public class UserController {
 			@RequestParam("commonsMultipartFile") CommonsMultipartFile commonsMultipartFile, HttpSession session) {
 		if (session != null) {
 			if (user != null) {
+				
+				
+				User u = userService.getUser(user.getUid());
+				List<Integer> tempAid = new ArrayList<Integer>();
+				
+				//check if address is not null before updating or deleting user address
+				if(u.getAddresss() != null) {
+					for(Address tempAddress : u.getAddresss()) {
+						tempAid.add(tempAddress.getAid());
+					}
+				}
+				
+			
 				if (user.getAddresss() != null) {
-					for (Address adr : user.getAddresss()) {
+					for(Iterator<Address> a = user.getAddresss().iterator(); a.hasNext();) {
+						
+						Address adr = a.next();
+						
+						//System.out.println("before checking null: "+ adr);
+						if ((adr.getInputAddress1() == null) || (adr.getCity() == null)
+								|| (adr.getState() == null)) {
+							System.out.println("Addres is null ,!, "+ adr);
+							
+							if(user.getAddresss().contains(adr)) {
+								//remove current address i.e null from user.getAddresss iteration object
+								a.remove();
+							}
+							
+							//user.getAddresss().remove(adr);
+							//continue;
+						} else {
+							if (adr != null && (adr.getInputAddress1() != null) && (adr.getCity() != null)
+									&& (adr.getState() != null)) {
+								
+								adr.setUser(user);
+								
+								//check if our old user address contains newly updated address field
+								if(tempAid.contains(adr.getAid()) || tempAid.isEmpty() || adr.getAid() == 0) {
+									
+									//remove contained element from previous address list so we can delete it later.
+									if(tempAid.contains(adr.getAid())) {
+										tempAid.remove((Object) adr.getAid());	
+									}															
+									
+								}
+								
+							}
 
-						if (adr == null && (adr.getInputAddress1() == null) && (adr.getCity() == null)
-								&& (adr.getState() == null)) {
-							user.getAddresss().remove(adr);
-							continue;
 						}
 
-						if (adr != null && (adr.getInputAddress1() != null) && (adr.getCity() != null)
-								&& (adr.getState() != null)) {
-							adr.setUser(user);
-							// adr.setAid(aid);
-							userAddressService.saveAddress(adr);
-						}
-
+						
+					}//forEach for address iteration
+					System.out.println("at last address: "+ user.getAddresss());
+				}
+				
+				//System.out.println("tempaid array at last : " + tempAid);
+				//lets iterate over tempAddress list and delete previous address
+				if(!tempAid.isEmpty()) {
+					for(int a : tempAid) {
+						userAddressService.deleteAddress(a);
 					}
 				}
 
@@ -270,10 +351,11 @@ public class UserController {
 				}
 
 				user.setType("user");
+				//System.out.println("before saving user address : "+user +"\n---------\n"+user.getAddresss());
 				userService.saveUser(user);
 				String msg = "User updates successfully";
 				model.addAttribute("msg", msg);
-
+				
 			}
 			Object findIfAdmin = session.getAttribute("isAdmin").toString();
 
@@ -287,7 +369,7 @@ public class UserController {
 			return "error";
 		}
 
-	}
+	}//updateAddress
 
 	// Address of user non ajax
 	@GetMapping("/userAddress")

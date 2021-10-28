@@ -11,15 +11,18 @@
 <html>
 <head>
 <title>User Form</title>
-<link rel="stylesheet" href="resources/core/css/bootstrap.min.css">
-<link rel="stylesheet" href="resources/core/css/font-awesome.css">
-<script src="resources/core/js/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="resources/core/js/bootstrap.min.js"></script>
-<script src="resources/core/js/jquery.validate.min.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/core/css/bootstrap.min.css">
+<link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/core/css/font-awesome.css">
+<script src="${pageContext.request.contextPath}/resources/core/js/jquery-3.6.0.min.js"></script>
+<script src="${pageContext.request.contextPath}/popper.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/core/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/core/js/jquery.validate.min.js"></script>
 <style type="text/css">
 .invalid{
 	color: red;
+}
+input.invalid {
+	border:1px solid red;
 }
 </style>
 </head>
@@ -105,7 +108,7 @@
 	        <div class="col-md-6">
 		       <div class="form-group">
 		       	<label for="phoneNumber" class="control-label">Phone Number <i class="text-danger">*</i></label>
-		        <form:input path="phoneNumber" cssClass="form-control" required="required" />
+		        <form:input path="phoneNumber" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" cssClass="form-control" required="required" />
 		       </div>	
 	       </div>
 	      </div>

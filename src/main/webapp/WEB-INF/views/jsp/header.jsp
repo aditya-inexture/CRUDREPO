@@ -20,17 +20,17 @@
       </li>
       <c:if test="${sessionScope.isAdmin}">
 	      <li class="nav-item">
-	        <a class="nav-link" href="list">List Users</a>
+	        <a class="nav-link" href="${pageContext.request.contextPath}/list">List Users</a>
 	      </li>
       </c:if>
       <c:if test="${sessionScope.isUser}">
       	<li class="nav-item">
-        	<a class="nav-link" href="listUser">Your profile</a>
+        	<a class="nav-link" href="${pageContext.request.contextPath}/listUser">Your profile</a>
       	</li>
       </c:if>
       <c:if test="${(not sessionScope.isUser) and (not sessionScope.isAdmin)}">
       <li class="nav-item">
-	        <a class="nav-link" href="showForm">Register</a>
+	        <a class="nav-link" href="${pageContext.request.contextPath}/showForm">Register</a>
 	  </li>
 	  </c:if>
 	</ul>

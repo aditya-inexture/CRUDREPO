@@ -1,7 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" isELIgnored="false"%>
+    pageEncoding="UTF-8"%>
+    
+<%@ page isELIgnored="false" %>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <%
   response.addHeader("Pragma", "no-cache");
@@ -12,10 +15,9 @@
 <html>
 <head>
 <title>Users List</title>
-<link rel="stylesheet" href="resources/core/css/bootstrap.min.css">
-<link rel="stylesheet" href="resources/core/css/font-awesome.css">
-<link rel="stylesheet" href="resources/core/css/dataTables.bootstrap4.min.css">
-
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/core/css/bootstrap.min.css">
+<link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/core/css/font-awesome.css">
+<link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/core/css/dataTables.bootstrap4.min.css">
 
 </head>
 <body>
@@ -72,9 +74,7 @@
 		       		<tr>
 		       			<td>${varStatus.count}</td>
 		       			<td>
-			       			<c:if test="${tempUser.type != 'admin' }">
-			       				<a class="fa fa-eye text-primary ml-2 mt-3" href="${ userDetailsLink }"></a>
-			       			</c:if>
+			       			<a class="fa fa-eye text-primary ml-2 mt-3" href="${ userDetailsLink }"></a>
 		       			</td>
 				        <td>${tempUser.firstName}</td>
 				        <td>${tempUser.lastName}</td>
@@ -90,21 +90,17 @@
 							<button class="btn btn-warning" data-toggle="modal" data-target=".bd-example-modal-lg" onclick="showUserAddress(${tempUser.uid})">User address</button>
 						</td>
 						<td>
-													
-						<c:if test="${tempUser.type == 'admin' }">
-						<button class="btn btn-danger text-light" disabled data-toggle="tooltip" data-placement="top" title="Can't delete admin account">
-						<i class="fa fa-trash"></i></button>		
-						</c:if>
-						
-						<c:if test="${tempUser.type == 'user' }">
-							<button class="btn btn-danger text-light" onclick="deleteUser(${tempUser.uid})">
+						 <c:if test="${tempUser.type != 'admin'}">
+						      <button class="btn btn-danger text-light" onclick="deleteUser(${tempUser.uid})">
 								<i class="fa fa-trash"></i>
 							</button>
-						</c:if>
+					      </c:if>
 							
 						</td>
 		       		</tr>
+		       		
 		       		</c:forEach>
+		       		
 				</tbody>
 		    </table>
 		</div>

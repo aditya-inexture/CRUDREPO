@@ -4,24 +4,21 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
-  response.addHeader("Pragma", "no-cache");
-  response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  response.setDateHeader("Expires", 0);
-%> 
+	response.addHeader("Pragma", "no-cache");
+	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+	response.setDateHeader("Expires", 0);
+%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<link rel="stylesheet" href="resources/core/css/bootstrap.min.css">
-<link rel="stylesheet" href="resources/core/css/font-awesome.css">
-<script src="resources/core/js/jquery-3.6.0.min.js"></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-	integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-	crossorigin="anonymous"></script>
-<script src="resources/core/js/bootstrap.min.js"></script>
-<script src="resources/core/js/jquery.validate.min.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/core/css/bootstrap.min.css">
+<link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/core/css/font-awesome.css">
+<script src="${pageContext.request.contextPath}/resources/core/js/jquery-3.6.0.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/core/js/popper.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/core/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/core/js/jquery.validate.min.js"></script>
 
 <style type="text/css">
 input:invalid:required {
@@ -31,11 +28,12 @@ input:invalid:required {
 </head>
 <body class="bg-light">
 	<header><%@include file="header.jsp"%></header>
-	
-			<c:if test="${(not sessionScope.isAdmin) and (not sessionScope.isUser)}">
-				<c:redirect url="/error" />
-			</c:if>
-			
+
+	<c:if
+		test="${(not sessionScope.isAdmin) and (not sessionScope.isUser)}">
+		<c:redirect url="/error" />
+	</c:if>
+
 	<div class="container">
 		<c:if test="${sessionScope.isAdmin  || sessionScope.isUser }">
 
@@ -64,29 +62,35 @@ input:invalid:required {
 					<div class="col-md-2"></div>
 					<div class="col-md-8">
 
-						<form:form action="updateUser" modelAttribute="user" enctype="multipart/form-data">
-						
-						<div class="row">
-							<div class="col">
-								<div class="text-center">
-								  <img width="30%" height="30%" src="data:image/jpeg;base64,${userImage}" class="rounded-circle mb-5" style="border-radius:50%;" alt="Profile picture">
-								</div>
-							</div>
-						</div>
-						<div>
+						<form:form action="updateUser" modelAttribute="user"
+							enctype="multipart/form-data">
+
 							<div class="row">
-								<div class="col-md-4 col-sm-4"></div>
-								<div class="col-md-4 col-sm-4">
-									<div class="form-group">
-									    <label for="exampleFormControlFile1" class="text-success">Change profile image</label>
-									    <input type="file" name="commonsMultipartFile" class="form-control-file" id="exampleFormControlFile1">
-									 </div>
+								<div class="col">
+									<div class="text-center">
+										<img width="30%" height="30%"
+											src="data:image/jpeg;base64,${userImage}"
+											class="rounded-circle mb-5" style="border-radius: 50%;"
+											alt="Profile picture">
+									</div>
 								</div>
-								<div class="col-md-4 col-sm-4"></div>
 							</div>
-						</div>
-						
+							<div>
+								<div class="row">
+									<div class="col-md-4 col-sm-4"></div>
+									<div class="col-md-4 col-sm-4">
+										<div class="form-group">
+											<label for="exampleFormControlFile1" class="text-success">Change
+												profile image</label> <input type="file" name="commonsMultipartFile"
+												class="form-control-file" id="exampleFormControlFile1">
+										</div>
+									</div>
+									<div class="col-md-4 col-sm-4"></div>
+								</div>
+							</div>
+
 							<form:hidden path="uid" cssClass="form-control" />
+
 							<span id="result"></span>
 							<div class="form-row">
 								<div class="col">
@@ -121,7 +125,7 @@ input:invalid:required {
 											class="text-danger">*</span></label>
 										<div class="row no-gutters">
 											<div class="col">
-												<form:password path="password" showPassword="true"
+												<form:password path="password"  showPassword="true"
 													cssClass="form-control" />
 											</div>
 											<div class="col pl-2" style="font-size: 1.5em;">
@@ -159,7 +163,7 @@ input:invalid:required {
 										<label for="phoneNumber" class="control-label">Contact
 											<i class="text-danger">*</i>
 										</label>
-										<form:input path="phoneNumber" cssClass="form-control"
+										<form:input path="phoneNumber" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" cssClass="form-control"
 											required="required" />
 									</div>
 								</div>
@@ -172,23 +176,20 @@ input:invalid:required {
 								</div>
 							</div>
 
-						<!-- Check if user has no address field 
+							<!-- Check if user has no address field 
 						(please check javascript to append below div tag if no address field found while runtime) -->
-						
-						<c:if test="${empty user.addresss }">
-						<div id="addressButtonWrapper">
-							<input type="hidden" id="addressCount"
-									value="-1" />
-								<div class="test-center">
-									<a href="javascript:void(0);"
-										id="firstAddress"
-										class="btn btn-success float-right" onclick="addAddress()"
-										title="Add field"><span
-										class="glyphicon glyphicon glyphicon-plus"
-										aria-hidden="true"></span>Add</a>
+
+							<c:if test="${empty user.addresss }">
+								<div id="addressButtonWrapper">
+									<input type="hidden" id="addressCount" value="-1" />
+									<div class="test-center">
+										<a href="javascript:void(0);" id="firstAddress"
+											class="btn btn-success float-right" onclick="addAddress()"
+											title="Add field"><span
+											class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>Add</a>
+									</div>
 								</div>
-							</div>
-						</c:if>
+							</c:if>
 
 
 
@@ -197,14 +198,14 @@ input:invalid:required {
 								<!-- Lets iterate over user address's -->
 								<c:forEach items="${ user.addresss }" var="addresss"
 									varStatus="status">
-										
+
 									<div
-										class="border mt-2 mb-2 p-2 bg-info text-light shadow-sm rounded text-monospace font-weight-bold">
-										
+										class="address_wrapper border mt-2 mb-2 p-2 bg-info text-light shadow-sm rounded text-monospace font-weight-bold">
+
 										<!-- Address unique id (primary key) -->
 										<form:hidden path="addresss[${status.index }].aid"
 											class="form-control" />
-											
+
 										<span class="bg-white text-dark"
 											style="box-shadow: 0.1rem 0.1rem 0.3rem 0.1rem white;">${status.count}</span>
 										<div class="form-row">
@@ -272,7 +273,7 @@ input:invalid:required {
 											</div>
 										</div>
 										<div class="form-row">
-											
+
 
 											<!-- construct an "update" link with address id -->
 											<%-- <c:url var="addressUpdateLink" value="/updateAddress">
@@ -291,13 +292,11 @@ input:invalid:required {
 
 											<!-- To delete current address of user -->
 											<%-- <div class="col-md-2 col-sm-6"><button value="${addresss.aid }" class="btn btn-danger deleteCurrentAddress">Delete</button></div> --%>
-											
-											<div class="col">
-												<a href="${addressDeleteLink }" class="btn btn-danger float-left">Remove</a>
-											</div>
-																								
-											
 
+											<div class="col">
+												<a href="javascript:void(0);"
+													class="btn btn-danger float-left remove_field">Remove</a>
+											</div>
 
 											<div class="col">
 
@@ -321,8 +320,8 @@ input:invalid:required {
 
 							<div class="mb-3">
 								<form:button name="submit" class="btn btn-primary btn-lg">Update</form:button>
-								<button id="reloadPage" type="button"
-									class="btn btn-warning btn-lg">Cancel</button>
+								<a id="reloadPage" href="${pageContext.request.contextPath }/"
+									class="btn btn-warning btn-lg">Cancel</a>
 							</div>
 
 						</form:form>
@@ -383,9 +382,10 @@ input:invalid:required {
 												}
 											});
 
-							$('#reloadPage').on('click', function() {
-								location.reload();
-							});
+							/* to reload current page */
+							/* $('#reloadPage').on('click', function() {
+								window.location.reload();
+							}); */
 
 						});
 	</script>
@@ -401,7 +401,6 @@ input:invalid:required {
 		var wrapper = $('.field_wrapper'); //Input field wrapper
 
 		var x = $("#addressCount").val();
-		
 
 		//Once add button is clicked
 		function addAddress() {
@@ -432,33 +431,36 @@ input:invalid:required {
 		});
 
 		//Once remove_button is clicked
-		$(wrapper).on(
-				'click',
-				'.remove_button',
-				function(e) {
-					e.preventDefault();
-					$(this).parent('fieldset').parent('div').fadeTo(800, 0.1,
-							function() {
-								$(this).slideUp(5000, function() {
-								}).remove(); //Remove field html.remove();
-							});
-					x--;//Decrement field counter
-					if(x == 0){
-						
-						//if value of x is zero then append add button to add address fields
-						
-						$("#addressButtonWrapper").append('<input type="hidden" id="addressCount"'
+		$(wrapper)
+				.on(
+						'click',
+						'.remove_button',
+						function(e) {
+							e.preventDefault();
+							$(this).parent('fieldset').parent('div').fadeTo(
+									800, 0.1, function() {
+										$(this).slideUp(5000, function() {
+										}).remove(); //Remove field html.remove();
+									});
+							x--;//Decrement field counter
+							if (x == 0) {
+
+								//if value of x is zero then append add button to add address fields
+
+								$("#addressButtonWrapper")
+										.append(
+												'<input type="hidden" id="addressCount"'
 								+' value="-1" />'
-								+'	<div class="test-center">'
-								+'		<a href="javascript:void(0);" '
-								+'			id="firstAddress" '
-								+'			class="btn btn-success float-right" onclick="addAddress()" '
-								+'			title="Add field"><span '
+														+ '	<div class="test-center">'
+														+ '		<a href="javascript:void(0);" '
+														+ '			id="firstAddress" '
+														+ '			class="btn btn-success float-right" onclick="addAddress()" '
+														+ '			title="Add field"><span '
 								+'			class="glyphicon glyphicon glyphicon-plus" '
 								+'			aria-hidden="true"></span>Add</a> '
-								+'	</div>');
-					}
-				});
+														+ '	</div>');
+							}
+						});
 
 		//calling add method which provides form add functionality
 		function addAddressFields(inc) {
@@ -490,8 +492,7 @@ input:invalid:required {
 					+ '</div>'
 					+ '</div>'
 					+ '</div>'
-					
-					
+
 					+ '<div class="form-row">'
 					+ '<div class="col">'
 					+ '<div class="form-group">'
@@ -523,10 +524,9 @@ input:invalid:required {
 					+ '].zip" class="form-control" />'
 					+ '</div>'
 					+ '</div>'
-					
-					
+
 					+ '</div>'
-					
+
 					+ '<div class="form-row">'
 					+ '<div class="col-md-6">'
 					+ '<div class="form-group">'
@@ -537,7 +537,7 @@ input:invalid:required {
 					+ '</div>'
 					+ '</div>'
 					+ '</div>'
-										
+
 					+ '<a href="javascript:void(0);" class="btn btn-success add_button_etc float-right" title="Add field"><span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>Add</a>'
 					+ '<a href="javascript:void(0);" class="btn btn-danger remove_button" title="Remove field"><span class="glyphicon glyphicon glyphicon-minus" aria-hidden="true"></span>'
 					+ 'Remove</a>' + '</fieldset></div>'; //New input field html
@@ -589,13 +589,25 @@ input:invalid:required {
 								phoneNumber : {
 									required : "Please enter your phone number",
 									minlength : jQuery.validator
-											.format("At least {0} characters required!"),
+											.format("only {0} characters allowed!"),
 									maxlength : jQuery.validator
 											.format("Please enter valid phone number")
 								},
 							}
 						});
 	</script>
+
+	<script type="text/javascript">
+		$(".remove_field").on('click', function(e) {
+			e.preventDefault();
+			alert("removing current address fields");
+			$(this).closest('.address_wrapper').fadeTo(800, 0.1, function() {
+				$(this).slideUp(5000, function() {
+				}).remove(); //Remove field html.remove();
+			});
+		});
+	</script>
+
 
 </body>
 </html>

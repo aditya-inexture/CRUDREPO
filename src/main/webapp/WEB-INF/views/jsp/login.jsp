@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath }/resources/core/css/bootstrap.min.css">
 <link rel="stylesheet" href="${ pageContext.request.contextPath }/resources/core/css/font-awesome.css">
 <script src="${pageContext.request.contextPath}/resources/core/js/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="${pageContext.request.contextPath}/resources/core/js/popper.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/core/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/core/js/jquery.validate.min.js"></script>
 <style type="text/css">
@@ -54,6 +54,9 @@
 						</div>
 						<div class="form-group"></div>
 						<form:button cssClass="btn  btn-primary"  value="Submit">Login</form:button>
+						<br>
+						<br>
+						<a href="${pageContext.request.contextPath}/forgotPassword">Forgot password?</a>
 					</form:form>
 				</div>
 			</div>
